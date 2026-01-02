@@ -55,7 +55,9 @@ function setupModuleWatcher(
     return;
   }
 
-  const configPath = path.join(moduleRoot, "config");
+  const config = vscode.workspace.getConfiguration("cfgo");
+  const inputFolder = config.get<string>("inputFolder", "config");
+  const configPath = path.join(moduleRoot, inputFolder);
 
   // Check if config folder exists
   if (!fs.existsSync(configPath)) {
@@ -85,12 +87,16 @@ function removeModuleWatcher(moduleRoot: string) {
 }
 
 async function handleFileChange(uri: vscode.Uri, moduleRoot: string) {
+  const config = vscode.workspace.getConfiguration("cfgo");
+  const binaryPath = config.get<string>("binaryPath", "cfgo");
+  const inputFolder = config.get<string>("inputFolder", "config");
+  const outputFolder = config.get<string>("outputFolder", "config/generated");
+
   const fileName = path.basename(uri.fsPath);
-  const inputFile = path.join(moduleRoot, "config", fileName);
+  const inputFile = path.join(moduleRoot, inputFolder, fileName);
   const outputFile = path.join(
     moduleRoot,
-    "config",
-    "generated",
+    outputFolder,
     fileName.replace(".json", ".go")
   );
 
@@ -100,11 +106,11 @@ async function handleFileChange(uri: vscode.Uri, moduleRoot: string) {
     fs.mkdirSync(outputDir, { recursive: true });
   }
 
-  console.log(`Running cfgo for ${fileName}`);
+  console.log(`Running ${binaryPath} for ${fileName}`);
 
   try {
     const { stdout, stderr } = await execAsync(
-      `cfgo "${inputFile}" "${outputFile}"`
+      `"${binaryPath}" "${inputFile}" "${outputFile}"`
     );
 
     if (stdout) {

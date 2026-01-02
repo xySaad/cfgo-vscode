@@ -19,7 +19,28 @@
     "workspaceContains:**/go.mod"
   ],
   "main": "./out/extension.js",
-  "contributes": {},
+  "contributes": {
+    "configuration": {
+      "title": "cfgo",
+      "properties": {
+        "cfgo.binaryPath": {
+          "type": "string",
+          "default": "cfgo",
+          "description": "Path to the cfgo binary. Use 'cfgo' to use the binary from PATH, or specify an absolute path."
+        },
+        "cfgo.inputFolder": {
+          "type": "string",
+          "default": "config",
+          "description": "Folder name (relative to module root) where JSON config files are located."
+        },
+        "cfgo.outputFolder": {
+          "type": "string",
+          "default": "config/generated",
+          "description": "Folder path (relative to module root) where generated Go files will be saved."
+        }
+      }
+    }
+  },
   "scripts": {
     "vscode:prepublish": "npm run compile",
     "compile": "tsc -p ./",
